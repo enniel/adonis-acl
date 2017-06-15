@@ -31,7 +31,7 @@ module.exports = {
           const chain = yield role.getPermissions()
           result = _.concat(result, chain)
           return result
-        }, []);
+        }, [])
         permissions = _.uniq(_.concat(permissions, rolePermissions))
       }
       return permissions
