@@ -1,6 +1,6 @@
 {
   "name": "adonis-acl",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Adonis ACL system",
   "main": "src/Acl/index.js",
   "directories": {
