@@ -6,7 +6,7 @@
  * MIT Licensed
  */
 
-const series = require('co-series')
+const reduce = require('co-reduce')
 const _ = require('lodash')
 const Acl = require('../Acl')
 
@@ -23,11 +23,15 @@ module.exports = {
       })
       if (typeof this.roles === 'function') {
         const roles = yield this.roles().fetch()
-        const rolePermissions = yield roles.reduce(series(function * (result, role) {
+        const roleList = []
+        roles.forEach(role => {
+          roleList.push(role)
+        })
+        const rolePermissions = yield reduce(roleList, function * (result, role) {
           const chain = yield role.getPermissions()
           result = _.concat(result, chain)
           return result
-        }), [])
+        }, []);
         permissions = _.uniq(_.concat(permissions, rolePermissions))
       }
       return permissions

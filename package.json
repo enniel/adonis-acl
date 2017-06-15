@@ -14,6 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "adonis-fold": "^3.0.3",
+    "co-reduce": "^1.0.1",
     "co-series": "^3.0.2",
     "lodash": "^4.17.4",
     "node-exceptions": "^2.0.1"
