@@ -10,21 +10,31 @@ const ForbiddenException = require('../Exceptions/ForbiddenException')
 const _ = require('lodash')
 
 class Is {
-  * handle (request, response, next, ...args) {
+  * check (user, args) {
     try {
       let operator = 'and'
       if (_.includes(['or', 'and'], args[0])) {
         operator = args[0]
         args = _.drop(args)
       }
-      const currentUser = request.currentUser || request.authUser
-      const is = yield currentUser.is(args, operator)
+      const is = yield user.is(args, operator)
       if (!is) {
         throw new ForbiddenException()
       }
     } catch (e) {
       throw e
     }
+  }
+
+  * handle (request, response, next, ...args) {
+    yield this.check(request.authUser, args)
+
+    yield next
+  }
+
+  * handleWs (socket, request, next, ...args) {
+    yield this.check(socket.authUser, args)
+
     yield next
   }
 }
