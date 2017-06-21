@@ -7,8 +7,16 @@
     "test": "test"
   },
   "scripts": {
-    "fix": "standard --fix src/**/*.js providers/*.js commands/*.js",
-    "lint": "standard src/**/*.js providers/*.js commands/*.js"
+    "lint": "standard",
+    "lint:fix": "standard --fix",
+    "precommit": "lint-staged",
+    "prepush": "lint-staged"
+  },
+  "lint-staged": {
+    "*.js": [
+      "npm run lint:fix",
+      "git add"
+    ]
   },
   "author": "Evgeny Razumov (enniel)",
   "license": "MIT",
@@ -20,6 +28,8 @@
     "node-exceptions": "^2.0.1"
   },
   "devDependencies": {
+    "husky": "^0.13.4",
+    "lint-staged": "^4.0.0",
     "standard": "^10.0.2"
   },
   "repository": {
