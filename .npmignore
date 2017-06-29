@@ -1,8 +1,14 @@
+bin
 node_modules
 npm-debug.log
+npm-error.log
 yarn-debug.log
 yarn-error.log
 yarn.lock
-.travis.yml
-.editorconfig
 package-lock.json
+.editorconfig
+.env
+test/unit/storage
+.travis.yaml
+.coveralls.yml
+coverage

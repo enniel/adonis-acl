@@ -20,6 +20,9 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 
+# Coveralls configuration file
+.coveralls.yml
+
 # nyc test coverage
 .nyc_output
 
@@ -60,11 +63,14 @@ typings/
 # Yarn lock file
 yarn.lock
 
-# npm lock file
+# Package lock file
 package-lock.json
 
 # dotenv environment variables file
 .env
+
+# sqlite storage
+test/unit/storage
 
 
 # End of https://www.gitignore.io/api/node
