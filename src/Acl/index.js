@@ -8,7 +8,7 @@
 
 const Acl = exports = module.exports = {}
 const _ = require('lodash')
-const NE = require('node-exceptions')
+const InvalidOperatorException = require('../Exceptions/InvalidOperatorException')
 
 Acl.and = (slug, items) => {
   return _.every(slug, (check) => {
@@ -31,7 +31,7 @@ Acl.or = (slug, items) => {
 Acl.check = (items, slug, operator = 'and') => {
   if (_.isArray(slug)) {
     if (!_.includes(['or', 'and'], operator)) {
-      throw new NE.InvalidArgumentException('Invalid operator, available operators are "and", "or".')
+      throw new InvalidOperatorException()
     }
     return Acl[operator](slug, items)
   }
