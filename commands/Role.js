@@ -1,27 +1,36 @@
 'use strict'
 
-const Ioc = require('adonis-fold').Ioc
-const Command = Ioc.use('Adonis/Src/Command')
-const Role = Ioc.use('Adonis/Acl/Role')
-const Permission = Ioc.use('Adonis/Acl/Permission')
-const Database = Ioc.use('Adonis/Src/Database')
-const series = require('co-series')
+/**
+ * adonis-acl
+ * Copyright(c) 2017 Evgeny Razumov
+ * MIT Licensed
+ */
+
+const { Command } = require('@adonisjs/ace')
+const Role = use('Adonis/Acl/Role')
+const Permission = use('Adonis/Acl/Permission')
+const Database = use('Adonis/Src/Database')
 const _ = require('lodash')
 
 class RoleCommand extends Command {
   /**
-   * signature defines the requirements and name
-   * of command.
+   * The command signature getter to define the
+   * command name, arguments and options.
+   *
+   * @attribute signature
+   * @static
    *
    * @return {String}
    */
-  get signature () {
+  static get signature () {
     return 'acl:role {slug} {name?} {description?} {--permissions=@value}'
   }
 
   /**
-   * description is the little helpful information displayed
-   * on the console.
+   * The command description getter.
+   *
+   * @attribute description
+   * @static
    *
    * @return {String}
    */
@@ -30,22 +39,29 @@ class RoleCommand extends Command {
   }
 
   /**
-   * handle method is invoked automatically by ace, once your
-   * command has been executed.
+   * The handle method to be executed
+   * when running command
    *
-   * @param  {Object} args    [description]
-   * @param  {Object} options [description]
+   * @method handle
+   *
+   * @param  {Object} args
+   * @param  {Object} options
+   *
+   * @return {void}
    */
-  * handle ({ slug, name, description }, { permissions }) {
+  async handle ({ slug, name, description }, { permissions }) {
     name = name || slug
-    let role = yield Role.query().where('slug', slug).first()
-    if (!role) {
-      role = new Role({ slug })
+    let role = await Role.findBy('slug', slug)
+    if (role) {
+      role.fill({
+        name, description
+      })
+      await role.save()
+    } else {
+      role = await Role.create({
+        slug, name, description
+      })
     }
-    role.fill({
-      name, description
-    })
-    yield role.save()
     permissions = _.reduce(_.split(permissions, ','), (result, permission) => {
       permission = _.trim(permission)
       if (permission.length) {
@@ -53,20 +69,22 @@ class RoleCommand extends Command {
       }
       return result
     }, [])
-    permissions = yield _.map(permissions, series(function * (permission) {
-      let entry = yield Permission.query().where('slug', permission).first()
+    for (let i in permissions) {
+      const permission = permissions[i]
+      let entry = await Permission.findBy('slug', permission)
       if (!entry) {
-        entry = yield Permission.create({
+        entry = await Permission.create({
           slug: permission, name: permission
         })
       }
-      return entry.id
-    }))
+      permissions[i] = entry.id
+    }
     if (permissions.length) {
-      yield role.permissions().sync(permissions)
+      await role.permissions().attach(permissions)
     }
     this.success(`${this.icon('success')} role ${name} is updated.`)
     Database.close()
+    return role
   }
 }
 

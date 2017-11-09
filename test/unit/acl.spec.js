@@ -6,83 +6,77 @@
  * MIT Licensed
  */
 
+const test = require('japa')
 const Acl = require('../../src/Acl')
-const chai = require('chai')
-chai.use(require('dirty-chai'))
-const expect = chai.expect
-require('co-mocha')
 
-describe('Acl', function () {
-  context('and()', function () {
-    it('should return false', function () {
-      expect(Acl.and(['admin', 'moderator'], [])).to.be.false()
-      expect(Acl.and(['admin', 'moderator'], ['admin'])).to.be.false()
-      expect(Acl.and(['admin', 'moderator'], ['admin', 'customer'])).to.be.false()
-      expect(Acl.and(['admin'], ['moderator'])).to.be.false()
-    })
-
-    it('should return true', function () {
-      expect(Acl.and(['admin', 'moderator'], ['admin', 'moderator'])).to.be.true()
-      expect(Acl.and(['admin', 'moderator'], ['admin', 'moderator', 'customer'])).to.be.true()
-      expect(Acl.and(['admin'], ['admin', 'moderator'])).to.be.true()
-      expect(Acl.and(['moderator'], ['admin', 'moderator'])).to.be.true()
-    })
+test.group('Acl.and', function () {
+  test('should return false', function (assert) {
+    assert.isFalse(Acl.and(['admin', 'moderator'], []))
+    assert.isFalse(Acl.and(['admin', 'moderator'], ['admin']))
+    assert.isFalse(Acl.and(['admin', 'moderator'], ['admin', 'customer']))
+    assert.isFalse(Acl.and(['admin'], ['moderator']))
   })
 
-  context('or()', function () {
-    it('should return false', function () {
-      expect(Acl.or(['admin', 'moderator'], [])).to.be.false()
-      expect(Acl.or(['admin', 'moderator'], ['customer'])).to.be.false()
-    })
+  test('should return true', function (assert) {
+    assert.isTrue(Acl.and(['admin', 'moderator'], ['admin', 'moderator']))
+    assert.isTrue(Acl.and(['admin', 'moderator'], ['admin', 'moderator', 'customer']))
+    assert.isTrue(Acl.and(['admin'], ['admin', 'moderator']))
+    assert.isTrue(Acl.and(['moderator'], ['admin', 'moderator']))
+  })
+})
 
-    it('should return true', function () {
-      expect(Acl.or(['admin', 'moderator'], ['admin'])).to.be.true()
-      expect(Acl.or(['admin', 'moderator'], ['admin', 'moderator', 'customer'])).to.be.true()
-      expect(Acl.or(['admin'], ['admin', 'moderator'])).to.be.true()
-      expect(Acl.or(['moderator'], ['admin', 'moderator'])).to.be.true()
-    })
+test.group('Acl.or', function () {
+  test('should return false', function (assert) {
+    assert.isFalse(Acl.or(['admin', 'moderator'], []))
+    assert.isFalse(Acl.or(['admin', 'moderator'], ['customer']))
   })
 
-  context('check()', function () {
-    it('should return false', function () {
-      expect(Acl.check([], ['admin', 'moderator'])).to.be.false()
-      expect(Acl.check(['admin'], ['admin', 'moderator'])).to.be.false()
-      expect(Acl.check(['admin', 'customer'], ['admin', 'moderator'])).to.be.false()
-      expect(Acl.check(['admin'], ['moderator'])).to.be.false()
-      expect(Acl.check([], ['admin', 'moderator'], 'and')).to.be.false()
-      expect(Acl.check(['admin'], ['admin', 'moderator'], 'and')).to.be.false()
-      expect(Acl.check(['admin', 'customer'], ['admin', 'moderator'], 'and')).to.be.false()
-      expect(Acl.check(['admin'], ['moderator'], 'and')).to.be.false()
-      expect(Acl.check([], ['admin', 'moderator'], 'or')).to.be.false()
-      expect(Acl.check(['customer'], ['admin', 'moderator'], 'or')).to.be.false()
-    })
+  test('should return true', function (assert) {
+    assert.isTrue(Acl.or(['admin', 'moderator'], ['admin']))
+    assert.isTrue(Acl.or(['admin', 'moderator'], ['admin', 'moderator', 'customer']))
+    assert.isTrue(Acl.or(['admin'], ['admin', 'moderator']))
+    assert.isTrue(Acl.or(['moderator'], ['admin', 'moderator']))
+  })
+})
 
-    it('should return true', function () {
-      expect(Acl.check(['admin', 'moderator'], ['admin', 'moderator'])).to.be.true()
-      expect(Acl.check(['admin', 'moderator', 'customer'], ['admin', 'moderator'])).to.be.true()
-      expect(Acl.check(['admin', 'moderator'], ['admin'])).to.be.true()
-      expect(Acl.check(['admin', 'moderator'], ['moderator'])).to.be.true()
-      expect(Acl.check(['admin', 'moderator'], 'moderator')).to.be.true()
-      expect(Acl.check(['admin', 'moderator'], ['admin', 'moderator'], 'and')).to.be.true()
-      expect(Acl.check(['admin', 'moderator', 'customer'], ['admin', 'moderator'], 'and')).to.be.true()
-      expect(Acl.check(['admin', 'moderator'], ['admin'], 'and')).to.be.true()
-      expect(Acl.check(['admin', 'moderator'], ['moderator'], 'and')).to.be.true()
-      expect(Acl.check(['admin', 'moderator'], 'moderator', 'and')).to.be.true()
-      expect(Acl.check(['admin'], ['admin', 'moderator'], 'or')).to.be.true()
-      expect(Acl.check(['admin', 'moderator', 'customer'], ['admin', 'moderator'], 'or')).to.be.true()
-      expect(Acl.check(['admin', 'moderator'], ['admin'], 'or')).to.be.true()
-      expect(Acl.check(['admin', 'moderator'], ['moderator'], 'or')).to.be.true()
-      expect(Acl.check(['admin', 'moderator'], 'moderator', 'or')).to.be.true()
-    })
+test.group('Acl.check', function () {
+  test('should return false', function (assert) {
+    assert.isFalse(Acl.check([], ['admin', 'moderator']))
+    assert.isFalse(Acl.check(['admin'], ['admin', 'moderator']))
+    assert.isFalse(Acl.check(['admin', 'customer'], ['admin', 'moderator']))
+    assert.isFalse(Acl.check(['admin'], ['moderator']))
+    assert.isFalse(Acl.check([], ['admin', 'moderator'], 'and'))
+    assert.isFalse(Acl.check(['admin'], ['admin', 'moderator'], 'and'))
+    assert.isFalse(Acl.check(['admin', 'customer'], ['admin', 'moderator'], 'and'))
+    assert.isFalse(Acl.check(['admin'], ['moderator'], 'and'))
+    assert.isFalse(Acl.check([], ['admin', 'moderator'], 'or'))
+    assert.isFalse(Acl.check(['customer'], ['admin', 'moderator'], 'or'))
+  })
 
-    it('should throw InvalidOperatorException', function () {
-      try {
-        Acl.check(['admin', 'moderator'], ['admin', 'moderator'], 'other')
-        expect(true).to.equal(false)
-      } catch (e) {
-        expect(e.name).to.equal('InvalidOperatorException')
-        expect(e.message).to.equal('Invalid operator, available operators are "and", "or".')
-      }
-    })
+  test('should return true', function (assert) {
+    assert.isTrue(Acl.check(['admin', 'moderator'], ['admin', 'moderator']))
+    assert.isTrue(Acl.check(['admin', 'moderator', 'customer'], ['admin', 'moderator']))
+    assert.isTrue(Acl.check(['admin', 'moderator'], ['admin']))
+    assert.isTrue(Acl.check(['admin', 'moderator'], ['moderator']))
+    assert.isTrue(Acl.check(['admin', 'moderator'], 'moderator'))
+    assert.isTrue(Acl.check(['admin', 'moderator'], ['admin', 'moderator'], 'and'))
+    assert.isTrue(Acl.check(['admin', 'moderator', 'customer'], ['admin', 'moderator'], 'and'))
+    assert.isTrue(Acl.check(['admin', 'moderator'], ['admin'], 'and'))
+    assert.isTrue(Acl.check(['admin', 'moderator'], ['moderator'], 'and'))
+    assert.isTrue(Acl.check(['admin', 'moderator'], 'moderator', 'and'))
+    assert.isTrue(Acl.check(['admin'], ['admin', 'moderator'], 'or'))
+    assert.isTrue(Acl.check(['admin', 'moderator', 'customer'], ['admin', 'moderator'], 'or'))
+    assert.isTrue(Acl.check(['admin', 'moderator'], ['admin'], 'or'))
+    assert.isTrue(Acl.check(['admin', 'moderator'], ['moderator'], 'or'))
+    assert.isTrue(Acl.check(['admin', 'moderator'], 'moderator', 'or'))
+  })
+
+  test('should throw InvalidOperatorException', function (assert) {
+    try {
+      Acl.check(['admin', 'moderator'], ['admin', 'moderator'], 'other')
+    } catch (e) {
+      assert.equal(e.name, 'InvalidOperatorException')
+      assert.equal(e.message, 'Invalid operator, available operators are "and", "or".')
+    }
   })
 })

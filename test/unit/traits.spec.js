@@ -6,175 +6,174 @@
  * MIT Licensed
  */
 
-const Model = require('adonis-lucid/src/Lucid/Model')
-const Database = require('adonis-lucid/src/Database')
-const BelongsToMany = require('adonis-lucid/src/Lucid/Relations/BelongsToMany')
+require('@adonisjs/lucid/lib/iocResolver').setFold(require('@adonisjs/fold'))
+const test = require('japa')
+const Model = require('@adonisjs/lucid/src/Lucid/Model')
+const DatabaseManager = require('@adonisjs/lucid/src/Database/Manager')
+const BelongsToMany = require('@adonisjs/lucid/src/Lucid/Relations/BelongsToMany')
+const { ioc } = require('@adonisjs/fold')
+const { Config, setupResolver } = require('@adonisjs/sink')
 const HasPermission = require('../../src/Traits/HasPermission')
 const HasRole = require('../../src/Traits/HasRole')
-const chai = require('chai')
-chai.use(require('dirty-chai'))
-const Ioc = require('adonis-fold').Ioc
-const expect = chai.expect
-const assert = chai.assert
-const filesFixtures = require('./fixtures/files')
-const databaseFixtures = require('./fixtures/database')
-const config = require('./helpers/config')
-require('co-mocha')
+const fixtures = require('../fixtures')
 
-describe('Traits', function () {
-  before(function * () {
-    Database._setConfigProvider(config)
-    Ioc.bind('Adonis/Src/Database', function () {
-      return Database
+test.group('Traits', function (group) {
+  group.before(async function () {
+    ioc.singleton('Adonis/Src/Database', function () {
+      const config = new Config()
+      config.set('database', require('../config'))
+      return new DatabaseManager(config)
     })
-    Ioc.bind('Adonis/Src/Lucid', function () {
-      return Model
-    })
-    Ioc.bind('Adonis/Src/Helpers', function () {
-      return {
-        makeNameSpace: function (hook) {
-          return `App/${hook}`
-        }
-      }
-    })
-    Ioc.bind('Adonis/Acl/Role', function () {
+    ioc.alias('Adonis/Src/Database', 'Database')
+    ioc.bind('Adonis/Src/Model', () => Model)
+    ioc.alias('Adonis/Src/Model', 'Model')
+    ioc.bind('Adonis/Acl/Role', function () {
       return require('../../src/Models/Role')
     })
-    Ioc.bind('Adonis/Acl/HasRole', function () {
-      return HasRole
+    ioc.bind('Adonis/Acl/HasRole', function () {
+      return new HasRole()
     })
-    Ioc.bind('Adonis/Acl/Permission', function () {
+    ioc.bind('Adonis/Acl/Permission', function () {
       return require('../../src/Models/Permission')
     })
-    Ioc.bind('Adonis/Acl/HasPermission', function () {
-      return HasPermission
+    ioc.bind('Adonis/Acl/HasPermission', function () {
+      return new HasPermission()
     })
-    yield filesFixtures.createDir()
-    yield databaseFixtures.up(Database)
+    const Database = use('Database')
+    await fixtures.up(Database)
+    setupResolver()
   })
 
-  after(function * () {
-    yield databaseFixtures.down(Database)
+  group.beforeEach(() => {
+    ioc.restore()
+  })
+
+  group.after(async function () {
+    const Database = use('Database')
+    await fixtures.down(Database)
     Database.close()
   })
 
-  it('should be able to assign HasPermission trait class to the model', function () {
-    class User extends Model {
-      static get traits () {
-        return [
-          'Adonis/Acl/HasPermission'
-        ]
-      }
-    }
-    User.bootIfNotBooted()
-    const user = new User()
-    expect(user.permissions).to.be.a('function')
-    expect(user.permissions() instanceof BelongsToMany).to.be.true()
-    expect(typeof user.getPermissions === 'function').to.be.true()
-    expect(typeof user.can === 'function').to.be.true()
+  group.afterEach(async function () {
+    const Database = use('Database')
+    await fixtures.truncate(Database, 'users')
+    await fixtures.truncate(Database, 'permissions')
+    await fixtures.truncate(Database, 'permission_user')
+    await fixtures.truncate(Database, 'roles')
+    await fixtures.truncate(Database, 'permission_role')
   })
 
-  it('should be able to assign HasRole trait class to the model', function () {
+  test('should be able to assign HasPermission trait class to the model', function (assert) {
     class User extends Model {
       static get traits () {
         return [
-          'Adonis/Acl/HasRole'
+          '@provider:Adonis/Acl/HasPermission'
         ]
       }
     }
-    User.bootIfNotBooted()
+    User._bootIfNotBooted()
     const user = new User()
-    expect(user.roles).to.be.a('function')
-    expect(user.roles() instanceof BelongsToMany).to.be.true()
-    expect(typeof user.getRoles === 'function').to.be.true()
-    expect(typeof user.is === 'function').to.be.true()
+    assert.isTrue(typeof user.permissions === 'function')
+    assert.isTrue(user.permissions() instanceof BelongsToMany)
+    assert.isTrue(typeof user.getPermissions === 'function')
+    assert.isTrue(typeof user.can === 'function')
   })
 
-  it('should be able to get permissions', function * () {
-    const Permission = Ioc.use('Adonis/Acl/Permission')
-    const Role = Ioc.use('Adonis/Acl/Role')
+  test('should be able to assign HasRole trait class to the model', function (assert) {
     class User extends Model {
       static get traits () {
         return [
-          'Adonis/Acl/HasRole',
-          'Adonis/Acl/HasPermission'
+          '@provider:Adonis/Acl/HasRole'
         ]
       }
     }
-    User.bootIfNotBooted()
-    const user = yield User.create({
+    User._bootIfNotBooted()
+    const user = new User()
+    assert.isTrue(typeof user.roles === 'function')
+    assert.isTrue(user.roles() instanceof BelongsToMany)
+    assert.isTrue(typeof user.getRoles === 'function')
+    assert.isTrue(typeof user.is === 'function')
+  })
+
+  test('should be able to get permissions', async function (assert) {
+    assert.plan(1)
+
+    const Permission = use('Adonis/Acl/Permission')
+    const Role = use('Adonis/Acl/Role')
+    class User extends Model {
+      static get traits () {
+        return [
+          '@provider:Adonis/Acl/HasRole',
+          '@provider:Adonis/Acl/HasPermission'
+        ]
+      }
+    }
+    User._bootIfNotBooted()
+    const user = await User.create({
       email: 'foo@bar.baz',
       username: 'test',
       password: 'secret'
     })
-    const createUsers = yield Permission.create({
+    const createUsers = await Permission.create({
       name: 'Create Users',
       slug: 'create_users'
     })
-    const readUsers = yield Permission.create({
+    const readUsers = await Permission.create({
       name: 'Read Users',
       slug: 'read_users'
     })
-    const removeUsers = yield Permission.create({
+    const removeUsers = await Permission.create({
       name: 'Remove Users',
       slug: 'remove_users'
     })
-    const administrator = yield Role.create({
+    const administrator = await Role.create({
       name: 'Administrator',
       slug: 'administrator'
     })
-    yield administrator.permissions().sync([
+    await administrator.permissions().attach([
       removeUsers.id, createUsers.id
     ])
-    yield user.roles().sync([
+    await user.roles().attach([
       administrator.id
     ])
-    yield user.permissions().sync([
+    await user.permissions().attach([
       readUsers.id
     ])
-    const userPermissions = yield user.getPermissions()
-    assert.deepEqual(userPermissions, [
-      'read_users', 'create_users', 'remove_users'
+    const userPermissions = await user.getPermissions()
+    assert.includeMembers(userPermissions, [
+      'read_users', 'remove_users', 'create_users'
     ])
-    yield databaseFixtures.truncate(Database, 'users')
-    yield databaseFixtures.truncate(Database, 'permissions')
-    yield databaseFixtures.truncate(Database, 'permission_user')
-    yield databaseFixtures.truncate(Database, 'roles')
-    yield databaseFixtures.truncate(Database, 'permission_role')
   })
 
-  it('should be able to get roles', function * () {
-    const Role = Ioc.use('Adonis/Acl/Role')
+  test('should be able to get roles', async function (assert) {
+    const Role = use('Adonis/Acl/Role')
     class User extends Model {
       static get traits () {
         return [
-          'Adonis/Acl/HasRole'
+          '@provider:Adonis/Acl/HasRole'
         ]
       }
     }
-    User.bootIfNotBooted()
-    const user = yield User.create({
+    User._bootIfNotBooted()
+    const user = await User.create({
       email: 'foo@bar.baz',
       username: 'test',
       password: 'secret'
     })
-    const administrator = yield Role.create({
+    const administrator = await Role.create({
       name: 'Administrator',
       slug: 'administrator'
     })
-    const moderator = yield Role.create({
+    const moderator = await Role.create({
       name: 'Moderator',
       slug: 'moderator'
     })
-    yield user.roles().sync([
+    await user.roles().attach([
       administrator.id, moderator.id
     ])
-    const userRoles = yield user.getRoles()
-    assert.deepEqual(userRoles, [
+    const userRoles = await user.getRoles()
+    assert.includeMembers(userRoles, [
       'administrator', 'moderator'
     ])
-    yield databaseFixtures.truncate(Database, 'users')
-    yield databaseFixtures.truncate(Database, 'roles')
-    yield databaseFixtures.truncate(Database, 'role_user')
   })
 })

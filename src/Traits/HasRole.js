@@ -9,23 +9,18 @@
 const _ = require('lodash')
 const Acl = require('../Acl')
 
-module.exports = {
+module.exports = class HasRole {
   register (Model) {
     Model.prototype.roles = function () {
       return this.belongsToMany('Adonis/Acl/Role')
     }
 
-    Model.prototype.getRoles = function * () {
-      const roles = (yield this.roles().fetch()).toJSON()
-      return _.map(roles, ({ slug }) => {
-        return slug
-      })
+    Model.prototype.getRoles = function () {
+      return this.roles().fetch().then(roles => _.map(roles.toJSON(), ({ slug }) => slug))
     }
 
-    Model.prototype.is = function * (slug, operator = 'and') {
-      const roles = yield this.getRoles()
-
-      return Acl.check(roles, slug, operator)
+    Model.prototype.is = function (slug, operator = 'and') {
+      return this.getRoles().then(roles => Acl.check(roles, slug, operator))
     }
   }
 }

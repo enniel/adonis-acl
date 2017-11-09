@@ -6,8 +6,7 @@
  * MIT Licensed
  */
 
-const Ioc = require('adonis-fold').Ioc
-const Model = Ioc.use('Adonis/Src/Lucid')
+const Model = use('Adonis/Src/Model')
 
 class Permission extends Model {
   static get rules () {

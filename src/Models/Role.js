@@ -6,8 +6,7 @@
  * MIT Licensed
  */
 
-const Ioc = require('adonis-fold').Ioc
-const Model = Ioc.use('Adonis/Src/Lucid')
+const Model = use('Adonis/Src/Model')
 const _ = require('lodash')
 
 class Role extends Model {
@@ -23,10 +22,9 @@ class Role extends Model {
     return this.belongsToMany('Adonis/Acl/Permission')
   }
 
-  * getPermissions () {
-    let permissions = (yield this.permissions().fetch()).toJSON()
-    return _.map(permissions, ({ slug }) => {
-      return slug
+  getPermissions () {
+    return this.permissions().fetch().then(permissions => {
+      return _.map(permissions.toJSON(), ({ slug }) => slug)
     })
   }
 }

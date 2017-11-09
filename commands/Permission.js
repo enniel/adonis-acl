@@ -1,48 +1,63 @@
 'use strict'
 
-const Ioc = require('adonis-fold').Ioc
-const Command = Ioc.use('Adonis/Src/Command')
-const Permission = Ioc.use('Adonis/Acl/Permission')
-const Database = Ioc.use('Adonis/Src/Database')
+/**
+ * adonis-acl
+ * Copyright(c) 2017 Evgeny Razumov
+ * MIT Licensed
+ */
+
+const { Command } = require('@adonisjs/ace')
+const Permission = use('Adonis/Acl/Permission')
+const Database = use('Adonis/Src/Database')
 
 class PermissionCommand extends Command {
   /**
-   * signature defines the requirements and name
-   * of command.
+   * The command signature getter to define the
+   * command name, arguments and options.
+   *
+   * @attribute signature
+   * @static
    *
    * @return {String}
    */
-  get signature () {
+  static get signature () {
     return 'acl:permission {slug} {name?} {description?}'
   }
 
   /**
-   * description is the little helpful information displayed
-   * on the console.
+   * The command description getter.
+   *
+   * @attribute description
+   * @static
    *
    * @return {String}
    */
-  get description () {
+  static get description () {
     return 'Create or update permission'
   }
 
   /**
-   * handle method is invoked automatically by ace, once your
-   * command has been executed.
+   * The handle method to be executed
+   * when running command
    *
-   * @param  {Object} args    [description]
-   * @param  {Object} options [description]
+   * @method handle
+   *
+   * @param  {Object} args
+   * @param  {Object} options
+   *
+   * @return {void}
    */
-  * handle ({ slug, name, description }, { permissions }) {
+  async handle ({ slug, name, description }, { permissions }) {
     name = name || slug
-    let permission = yield Permission.query().where('slug', slug).first()
-    if (!permission) {
-      permission = new Permission({ slug })
+    let permission = await Permission.findBy('slug', slug)
+    if (permission) {
+      permission.fill({
+        name, description
+      })
+      await permission.save()
+    } else {
+      permission = await Permission.create({ slug, name, description })
     }
-    permission.fill({
-      name, description
-    })
-    yield permission.save()
     this.success(`${this.icon('success')} permission ${name} is updated.`)
     Database.close()
   }

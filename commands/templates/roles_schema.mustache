@@ -3,7 +3,6 @@
 const Schema = use('Schema')
 
 class RolesTableSchema extends Schema {
-
   up () {
     this.create('roles', table => {
       table.increments()
@@ -17,7 +16,6 @@ class RolesTableSchema extends Schema {
   down () {
     this.drop('roles')
   }
-
 }
 
 module.exports = RolesTableSchema

@@ -6,22 +6,20 @@
  * MIT Licensed
  */
 
-const ServiceProvider = require('adonis-fold').ServiceProvider
+const ace = require('@adonisjs/ace')
+const { ServiceProvider } = require('@adonisjs/fold')
 
 class CommandsProvider extends ServiceProvider {
-  * register () {
-    this.app.bind('Adonis/Commands/Acl:Setup', function () {
-      const Setup = require('../commands/Setup')
-      return new Setup()
-    })
-    this.app.bind('Adonis/Commands/Acl:Role', function () {
-      const Role = require('../commands/Role')
-      return new Role()
-    })
-    this.app.bind('Adonis/Commands/Acl:Permission', function () {
-      const Permission = require('../commands/Permission')
-      return new Permission()
-    })
+  register () {
+    this.app.bind('Adonis/Commands/Acl:Setup', () => require('../commands/Setup'))
+    this.app.bind('Adonis/Commands/Acl:Role', () => require('../commands/Role'))
+    this.app.bind('Adonis/Commands/Acl:Permission', () => require('../commands/Permission'))
+  }
+
+  boot () {
+    ace.addCommand('Adonis/Commands/Acl:Setup')
+    ace.addCommand('Adonis/Commands/Acl:Role')
+    ace.addCommand('Adonis/Commands/Acl:Permission')
   }
 }
 

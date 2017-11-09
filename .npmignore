@@ -8,7 +8,7 @@ yarn.lock
 package-lock.json
 .editorconfig
 .env
-test/unit/storage
-.travis.yaml
-.coveralls.yml
+test/tmp
+test/database
 coverage
+.nyc_output
