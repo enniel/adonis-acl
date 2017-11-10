@@ -20,19 +20,19 @@ class AclProvider extends ServiceProvider {
       Permission._bootIfNotBooted()
       return Permission
     })
-    this.app.bind('Adonis/Acl/HasRole', function () {
+    this.app.bind('Adonis/Acl/HasRole', () => {
       const HasRole = require('../src/Traits/HasRole')
       return new HasRole()
     })
-    this.app.bind('Adonis/Acl/HasPermission', function () {
+    this.app.bind('Adonis/Acl/HasPermission', () => {
       const HasPermission = require('../src/Traits/HasPermission')
       return new HasPermission()
     })
-    this.app.bind('Adonis/Acl/Is', function () {
+    this.app.bind('Adonis/Acl/Is', () => {
       const Is = require('../src/Middlewares/Is')
       return new Is()
     })
-    this.app.bind('Adonis/Acl/Can', function () {
+    this.app.bind('Adonis/Acl/Can', () => {
       const Can = require('../src/Middlewares/Can')
       return new Can()
     })

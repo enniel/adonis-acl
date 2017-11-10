@@ -16,24 +16,23 @@ module.exports = class HasPermission {
     }
 
     Model.prototype.getPermissions = async function () {
-      let permissions = (await this.permissions().fetch()).toJSON()
-      permissions = _.map(permissions, ({ slug }) => slug)
+      let permissions = await this.permissions().fetch()
+      permissions = permissions.rows.map(({ slug }) => slug)
       if (typeof this.roles === 'function') {
         const roles = await this.roles().fetch()
-        let rolePermissions = []
+        let rolesPermissions = []
         for (let role of roles.rows) {
-          const chain = await role.getPermissions()
-          rolePermissions = _.concat(rolePermissions, chain)
+          const rolePermissions = await role.getPermissions()
+          rolesPermissions = rolesPermissions.concat(rolePermissions)
         }
-        permissions = _.uniq(_.concat(permissions, rolePermissions))
+        permissions = _.uniq(permissions.concat(rolesPermissions))
       }
       return permissions
     }
 
-    Model.prototype.can = function (slug, operator = 'and') {
-      return this.getPermissions().then(permissions => {
-        return Acl.check(permissions, slug, operator)
-      })
+    Model.prototype.can = async function (slug, operator = 'and') {
+      const permissions = await this.getPermissions()
+      return Acl.check(permissions, slug, operator)
     }
   }
 }

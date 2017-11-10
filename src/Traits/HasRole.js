@@ -6,7 +6,6 @@
  * MIT Licensed
  */
 
-const _ = require('lodash')
 const Acl = require('../Acl')
 
 module.exports = class HasRole {
@@ -15,12 +14,14 @@ module.exports = class HasRole {
       return this.belongsToMany('Adonis/Acl/Role')
     }
 
-    Model.prototype.getRoles = function () {
-      return this.roles().fetch().then(roles => _.map(roles.toJSON(), ({ slug }) => slug))
+    Model.prototype.getRoles = async function () {
+      const roles = await this.roles().fetch()
+      return roles.rows.map(({ slug }) => slug)
     }
 
-    Model.prototype.is = function (slug, operator = 'and') {
-      return this.getRoles().then(roles => Acl.check(roles, slug, operator))
+    Model.prototype.is = async function (slug, operator = 'and') {
+      const roles = await this.getRoles()
+      return Acl.check(roles, slug, operator)
     }
   }
 }

@@ -7,7 +7,6 @@
  */
 
 const Model = use('Adonis/Src/Model')
-const _ = require('lodash')
 
 class Role extends Model {
   static get rules () {
@@ -22,10 +21,9 @@ class Role extends Model {
     return this.belongsToMany('Adonis/Acl/Permission')
   }
 
-  getPermissions () {
-    return this.permissions().fetch().then(permissions => {
-      return _.map(permissions.toJSON(), ({ slug }) => slug)
-    })
+  async getPermissions () {
+    const permissions = await this.permissions().fetch()
+    return permissions.rows.map(({ slug }) => slug)
   }
 }
 
