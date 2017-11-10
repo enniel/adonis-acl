@@ -6,6 +6,7 @@
  * MIT Licensed
  */
 
+const _ = require('lodash')
 const Acl = require('../Acl')
 
 module.exports = class HasRole {
@@ -19,9 +20,9 @@ module.exports = class HasRole {
       return roles.rows.map(({ slug }) => slug)
     }
 
-    Model.prototype.is = async function (slug, operator = 'and') {
+    Model.prototype.is = async function (expression) {
       const roles = await this.getRoles()
-      return Acl.check(roles, slug, operator)
+      return Acl.check(expression, operand => _.includes(roles, operand))
     }
   }
 }

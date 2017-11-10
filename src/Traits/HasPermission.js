@@ -30,9 +30,9 @@ module.exports = class HasPermission {
       return permissions
     }
 
-    Model.prototype.can = async function (slug, operator = 'and') {
+    Model.prototype.can = async function (expression) {
       const permissions = await this.getPermissions()
-      return Acl.check(permissions, slug, operator)
+      return Acl.check(expression, operand => _.includes(permissions, operand))
     }
   }
 }
