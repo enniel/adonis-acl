@@ -11,6 +11,15 @@ const _ = require('lodash')
 const Acl = require('../../src/Acl')
 
 test.group('Acl', function () {
+  test('without operators', async (assert) => {
+    assert.isTrue(await Acl.check('admin', (operand) => {
+      return _.includes(['admin'], operand)
+    }))
+    assert.isTrue(await Acl.check('(admin)', (operand) => {
+      return _.includes(['admin'], operand)
+    }))
+  })
+
   test('and operator', async (assert) => {
     assert.isTrue(await Acl.check('admin && moderator', (operand) => {
       return _.includes(['admin', 'moderator'], operand)
