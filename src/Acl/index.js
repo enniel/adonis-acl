@@ -110,7 +110,8 @@ const calculateRPN = async (rpn, toBool) => {
       const result = await operator.func(...args)
       stack.push(result)
     } else {
-      stack.push(token)
+      const result = await toBool(token)
+      stack.push(result)
     }
   }
   return stack[0]
