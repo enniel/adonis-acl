@@ -51,7 +51,9 @@
   },
   "nyc": {
     "include": [
-      "src"
+      "src",
+      "providers",
+      "commands"
     ]
   },
   "standard": {
