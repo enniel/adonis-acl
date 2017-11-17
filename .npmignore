@@ -11,4 +11,6 @@ package-lock.json
 test/tmp
 test/database
 coverage
+.coveralls.yml
+.travis.yml
 .nyc_output
