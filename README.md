@@ -2,6 +2,8 @@
 
 Adonis ACL adds role based permissions to built in [Auth System](https://github.com/adonisjs/adonis-auth) of [Adonis Framework](https://github.com/adonisjs/adonis-framework).
 
+[![Coverage Status](https://coveralls.io/repos/github/enniel/adonis-acl/badge.svg?branch=master)](https://coveralls.io/github/enniel/adonis-acl?branch=master)
+
 ## Installation
 
 1. Add package:

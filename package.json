@@ -8,12 +8,14 @@
   },
   "scripts": {
     "pretest": "npm run test:cleanup && npm run lint",
+    "posttest": "npm run test:cleanup && npm run coverage",
     "test:cleanup": "rm -rf test/database && rm -rf test/tmp",
-    "test": "NO_ANSI=false FORCE_COLOR=true DB=sqlite3 node ./bin/index.js --local",
+    "test": "NO_ANSI=false FORCE_COLOR=true DB=sqlite3 nyc node ./bin/index.js --local",
     "lint": "standard",
     "lint:fix": "standard --fix",
     "precommit": "npm run test && lint-staged",
-    "prepush": "npm run test && lint-staged"
+    "prepush": "npm run test && lint-staged",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "lint-staged": {
     "*.js": [
@@ -33,12 +35,14 @@
     "@adonisjs/lucid": "^4.0.21",
     "@adonisjs/sink": "^1.0.13",
     "child_process": "^1.0.2",
+    "coveralls": "^3.0.0",
     "dotenv": "^4.0.0",
     "husky": "^0.13.4",
     "japa": "^1.0.5",
     "japa-cli": "^1.0.1",
     "lint-staged": "^4.0.0",
     "mysql": "^2.13.0",
+    "nyc": "^11.3.0",
     "pg": "^6.3.1",
     "semver": "^5.3.0",
     "sqlite3": "^3.1.8",
