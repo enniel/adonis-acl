@@ -9,6 +9,7 @@
 const test = require('japa')
 const Is = require('../../src/Middlewares/Is')
 const Can = require('../../src/Middlewares/Can')
+const Scope = require('../../src/Middlewares/Scope')
 
 test.group('Can Middleware', function () {
   test('should allow', async (assert) => {
@@ -77,6 +78,43 @@ test.group('Is Middleware', function () {
       }
       const is = new Is()
       await is.handle(fakeRequest, () => {}, 'administrator || moderator')
+    } catch (e) {
+      assert.equal(e.name, 'ForbiddenException')
+      assert.equal(e.message, 'Access forbidden. You are not allowed to this resource.')
+    }
+  })
+})
+
+test.group('Scope Middleware', function () {
+  test('should allow', async (assert) => {
+    const fakeRequest = {
+      auth: {
+        user: {
+          scope () {
+            return true
+          }
+        }
+      }
+    }
+    const scope = new Scope()
+    await scope.handle(fakeRequest, () => {
+      return assert.isTrue(true)
+    }, 'administrator || moderator')
+  })
+
+  test('should throw error', async (assert) => {
+    try {
+      const fakeRequest = {
+        auth: {
+          user: {
+            scope () {
+              return false
+            }
+          }
+        }
+      }
+      const scope = new Scope()
+      await scope.handle(fakeRequest, () => {}, 'user:*')
     } catch (e) {
       assert.equal(e.name, 'ForbiddenException')
       assert.equal(e.message, 'Access forbidden. You are not allowed to this resource.')

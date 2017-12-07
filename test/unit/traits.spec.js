@@ -145,6 +145,92 @@ test.group('Traits', function (group) {
     ])
   })
 
+  test('should be able to check permissions', async function (assert) {
+    assert.plan(1)
+
+    const Permission = use('Adonis/Acl/Permission')
+    const Role = use('Adonis/Acl/Role')
+    class User extends Model {
+      static get traits () {
+        return [
+          '@provider:Adonis/Acl/HasRole',
+          '@provider:Adonis/Acl/HasPermission'
+        ]
+      }
+    }
+    User._bootIfNotBooted()
+    const user = await User.create({
+      email: 'foo@bar.baz',
+      username: 'test',
+      password: 'secret'
+    })
+    const createUsers = await Permission.create({
+      name: 'Create Users',
+      slug: 'create_users'
+    })
+    const readUsers = await Permission.create({
+      name: 'Read Users',
+      slug: 'read_users'
+    })
+    const removeUsers = await Permission.create({
+      name: 'Remove Users',
+      slug: 'remove_users'
+    })
+    const administrator = await Role.create({
+      name: 'Administrator',
+      slug: 'administrator'
+    })
+    await administrator.permissions().attach([
+      removeUsers.id, createUsers.id
+    ])
+    await user.roles().attach([
+      administrator.id
+    ])
+    await user.permissions().attach([
+      readUsers.id
+    ])
+    const can = await user.can('read_users && remove_users && create_users')
+    assert.isTrue(can)
+  })
+
+  test('should be able to check scope', async function (assert) {
+    assert.plan(4)
+
+    const Permission = use('Adonis/Acl/Permission')
+    class User extends Model {
+      static get traits () {
+        return [
+          '@provider:Adonis/Acl/HasPermission'
+        ]
+      }
+    }
+    User._bootIfNotBooted()
+    const user = await User.create({
+      email: 'foo@bar.baz',
+      username: 'test',
+      password: 'secret'
+    })
+    const createUsers = await Permission.create({
+      name: 'Create Users',
+      slug: 'user:create'
+    })
+    const readUsers = await Permission.create({
+      name: 'Read Users',
+      slug: 'user:read'
+    })
+    const removeUsers = await Permission.create({
+      name: 'Remove Users',
+      slug: 'user:remove'
+    })
+    await user.permissions().attach([
+      readUsers.id, createUsers.id, removeUsers.id
+    ])
+    assert.isTrue(await user.scope(['user:*']))
+    assert.isTrue(await user.scope(['user:*', 'user:remove']))
+    assert.isFalse(await user.scope(['user:any']))
+    assert.isFalse(await user.scope(['user:*', 'user:any']))
+  })
+
   test('should be able to get roles', async function (assert) {
     const Role = use('Adonis/Acl/Role')
     class User extends Model {
@@ -175,5 +261,35 @@ test.group('Traits', function (group) {
     assert.includeMembers(userRoles, [
       'administrator', 'moderator'
     ])
+  })
+
+  test('should be able to check role', async function (assert) {
+    const Role = use('Adonis/Acl/Role')
+    class User extends Model {
+      static get traits () {
+        return [
+          '@provider:Adonis/Acl/HasRole'
+        ]
+      }
+    }
+    User._bootIfNotBooted()
+    const user = await User.create({
+      email: 'foo@bar.baz',
+      username: 'test',
+      password: 'secret'
+    })
+    const administrator = await Role.create({
+      name: 'Administrator',
+      slug: 'administrator'
+    })
+    const moderator = await Role.create({
+      name: 'Moderator',
+      slug: 'moderator'
+    })
+    await user.roles().attach([
+      administrator.id, moderator.id
+    ])
+    const is = await user.is('administrator && moderator')
+    assert.isTrue(is)
   })
 })

@@ -42,6 +42,9 @@ test.group('Providers', (group) => {
     assert.isDefined(ioc.use('Adonis/Acl/HasPermission'))
     assert.isFalse(ioc._bindings['Adonis/Acl/HasPermission'].singleton)
 
+    assert.isDefined(ioc.use('Adonis/Acl/Scope'))
+    assert.isFalse(ioc._bindings['Adonis/Acl/Scope'].singleton)
+
     assert.isDefined(ioc.use('Adonis/Acl/Is'))
     assert.isFalse(ioc._bindings['Adonis/Acl/Is'].singleton)
 

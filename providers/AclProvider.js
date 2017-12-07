@@ -36,6 +36,10 @@ class AclProvider extends ServiceProvider {
       const Can = require('../src/Middlewares/Can')
       return new Can()
     })
+    this.app.bind('Adonis/Acl/Scope', () => {
+      const Scope = require('../src/Middlewares/Scope')
+      return new Scope()
+    })
   }
 }
 

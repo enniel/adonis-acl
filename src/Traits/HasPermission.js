@@ -9,6 +9,19 @@
 const _ = require('lodash')
 const Acl = require('../Acl')
 
+const validateScope = (required, provided) => {
+  return _.every(required, (scope) => {
+    return _.some(provided, (permission) => {
+      // user:* -> user:create, user:view:self
+      const regExp = new RegExp('^' + scope.replace('*', '.*') + '$')
+      if (regExp.exec(permission)) {
+        return true
+      }
+      return false
+    })
+  })
+}
+
 module.exports = class HasPermission {
   register (Model) {
     Model.prototype.permissions = function () {
@@ -33,6 +46,11 @@ module.exports = class HasPermission {
     Model.prototype.can = async function (expression) {
       const permissions = await this.getPermissions()
       return Acl.check(expression, operand => _.includes(permissions, operand))
+    }
+
+    Model.prototype.scope = async function (required) {
+      const provided = await this.getPermissions()
+      return validateScope(required, provided)
     }
   }
 }
