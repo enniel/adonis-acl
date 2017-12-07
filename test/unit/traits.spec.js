@@ -212,23 +212,23 @@ test.group('Traits', function (group) {
     })
     const createUsers = await Permission.create({
       name: 'Create Users',
-      slug: 'user:create'
+      slug: 'user.create'
     })
     const readUsers = await Permission.create({
       name: 'Read Users',
-      slug: 'user:read'
+      slug: 'user.read'
     })
     const removeUsers = await Permission.create({
       name: 'Remove Users',
-      slug: 'user:remove'
+      slug: 'user.remove'
     })
     await user.permissions().attach([
       readUsers.id, createUsers.id, removeUsers.id
     ])
-    assert.isTrue(await user.scope(['user:*']))
-    assert.isTrue(await user.scope(['user:*', 'user:remove']))
-    assert.isFalse(await user.scope(['user:any']))
-    assert.isFalse(await user.scope(['user:*', 'user:any']))
+    assert.isTrue(await user.scope(['user.*']))
+    assert.isTrue(await user.scope(['user.*', 'user.remove']))
+    assert.isFalse(await user.scope(['user.any']))
+    assert.isFalse(await user.scope(['user.*', 'user.any']))
   })
 
   test('should be able to get roles', async function (assert) {

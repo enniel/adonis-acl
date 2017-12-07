@@ -12,7 +12,7 @@ const Acl = require('../Acl')
 const validateScope = (required, provided) => {
   return _.every(required, (scope) => {
     return _.some(provided, (permission) => {
-      // user:* -> user:create, user:view:self
+      // user.* -> user.create, user.view.self
       const regExp = new RegExp('^' + scope.replace('*', '.*') + '$')
       if (regExp.exec(permission)) {
         return true

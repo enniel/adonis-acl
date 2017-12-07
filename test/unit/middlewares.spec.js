@@ -99,7 +99,7 @@ test.group('Scope Middleware', function () {
     const scope = new Scope()
     await scope.handle(fakeRequest, () => {
       return assert.isTrue(true)
-    }, 'administrator || moderator')
+    }, 'user.*')
   })
 
   test('should throw error', async (assert) => {
@@ -114,7 +114,7 @@ test.group('Scope Middleware', function () {
         }
       }
       const scope = new Scope()
-      await scope.handle(fakeRequest, () => {}, 'user:*')
+      await scope.handle(fakeRequest, () => {}, 'user.*')
     } catch (e) {
       assert.equal(e.name, 'ForbiddenException')
       assert.equal(e.message, 'Access forbidden. You are not allowed to this resource.')
