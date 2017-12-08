@@ -9,9 +9,9 @@
 const ForbiddenException = require('../Exceptions/ForbiddenException')
 
 class Scope {
-  async handle ({ auth }, next, ...expression) {
-    const scope = await auth.user.scope(...expression)
-    if (!scope) {
+  async handle ({ auth }, next, ...requiredScope) {
+    const isAllowed = await auth.user.scope(requiredScope)
+    if (!isAllowed) {
       throw new ForbiddenException()
     }
 
