@@ -1,5 +1,7 @@
 # Adonis ACL
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/enniel/adonis-acl.svg)](https://greenkeeper.io/)
+
 Adonis ACL adds role based permissions to built in [Auth System](https://github.com/adonisjs/adonis-auth) of [Adonis Framework](https://github.com/adonisjs/adonis-framework).
 
 [![NPM Version](https://img.shields.io/npm/v/adonis-acl.svg?style=flat-square)](https://npmjs.org/package/adonis-acl)
