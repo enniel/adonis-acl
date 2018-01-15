@@ -41,6 +41,16 @@ class AclProvider extends ServiceProvider {
       return new Scope()
     })
   }
+
+  boot () {
+    /**
+     * Adding tags to the view, only when view provider is registered
+     */
+    try {
+      const View = this.app.use('Adonis/Src/View')
+      require('../src/ViewBindings')(View)
+    } catch (error) {}
+  }
 }
 
 module.exports = AclProvider
