@@ -14,26 +14,15 @@ const Acl = exports = module.exports = {}
 const operators = {
   or: {
     precedence: 1,
-    func: (a, b, toBool) => {
-      a = toBool(a)
-      b = toBool(b)
-      return a || b
-    }
+    func: (a, b) => a || b
   },
   and: {
     precedence: 2,
-    func: (a, b, toBool) => {
-      a = toBool(a)
-      b = toBool(b)
-      return a && b
-    }
+    func: (a, b) => a && b
   },
   not: {
     precedence: 3,
-    func: (b, toBool) => {
-      b = toBool(b)
-      return !b
-    },
+    func: b => !b,
     n: 1
   }
 }
@@ -65,6 +54,14 @@ const addSpaces = (string) => {
 // Uses the shunting-yard algorithm to convert infix notation
 // into Reverse Polish Notation
 const convertToRPN = (exp) => {
+  if (typeof exp !== 'string') {
+    throw new InvalidExpression()
+  }
+  exp = exp
+    .replace(/\s+/g, ' ')
+    .replace(/\s+$/, '')
+    .replace(/^\s+/, '')
+  exp = addSpaces(exp)
   const stack = []
   const rpn = []
   for (let token of exp.trim().split(' ')) {
@@ -97,7 +94,15 @@ const convertToRPN = (exp) => {
   return rpn.concat(stack.reverse())
 }
 
-const calculateRPN = (rpn, toBool) => {
+const toBool = (operand, checker) => {
+  if (typeof operand === 'boolean') {
+    return operand
+  }
+  return checker(operand)
+}
+
+Acl.check = (expression, checker) => {
+  const rpn = convertToRPN(expression)
   const stack = []
   for (let token of rpn) {
     const operator = operators[token]
@@ -105,34 +110,18 @@ const calculateRPN = (rpn, toBool) => {
       const numArgs = operator.n || 2
       let args = []
       for (let i = 1; i <= numArgs; i++) {
-        args.push(stack.pop())
+        const arg = toBool(stack.pop(), checker)
+        args.push(arg)
       }
-      args = args.reverse().concat(toBool)
+      args = args.reverse()
       const result = operator.func(...args)
       stack.push(result)
     } else {
-      const result = toBool(token)
+      const result = toBool(token, checker)
       stack.push(result)
     }
   }
   return stack[0]
-}
-
-Acl.check = (expression, toBool) => {
-  if (typeof expression !== 'string') {
-    throw new InvalidExpression()
-  }
-  expression = expression
-               .replace(/\s+/g, ' ')
-               .replace(/\s+$/, '')
-               .replace(/^\s+/, '')
-  expression = addSpaces(expression)
-  return calculateRPN(convertToRPN(expression), (operand) => {
-    if (typeof operand === 'boolean') {
-      return operand
-    }
-    return toBool(operand)
-  })
 }
 
 Acl.validateScope = (required, provided) => {
