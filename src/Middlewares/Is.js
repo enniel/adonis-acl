@@ -9,7 +9,11 @@
 const ForbiddenException = require('../Exceptions/ForbiddenException')
 
 class Is {
-  async handle ({ auth }, next, expression) {
+  async handle ({ auth }, next, ...args) {
+    let expression = args[0]
+    if (Array.isArray(expression)) {
+      expression = expression[0]
+    }
     const is = await auth.user.is(expression)
     if (!is) {
       throw new ForbiddenException()
