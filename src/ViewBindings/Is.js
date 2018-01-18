@@ -6,6 +6,9 @@
  * MIT Licensed
  */
 
+const _ = require('lodash')
+const Acl = require('../Acl')
+
 module.exports = function (BaseTag) {
   return class IsTag extends BaseTag {
     /**
@@ -50,8 +53,7 @@ module.exports = function (BaseTag) {
       /**
        * Open tag
        */
-      buffer.writeLine(`var user = this.context.accessChild(this.context.resolve('auth'), ['user'])`)
-      buffer.writeLine(`if (user && user.is(${compiledStatement})) {`)
+      buffer.writeLine(`if (this.context.is(${compiledStatement})) {`)
       buffer.indent()
 
       /**
@@ -71,6 +73,11 @@ module.exports = function (BaseTag) {
      *
      * @method run
      */
-    run () {}
+    run (Context) {
+      Context.macro('is', function (expression) {
+        const roles = this.accessChild(this.resolve('acl'), ['roles'])
+        return Acl.check(expression, operand => _.includes(roles, operand))
+      })
+    }
   }
 }

@@ -40,10 +40,8 @@ test.group('View Can Tag', function (group) {
     `
 
     const data = {
-      auth: {
-        user: {
-          can: () => true
-        }
+      acl: {
+        permissions: ['view_user', 'edit_user']
       }
     }
     assert.equal(edge.renderString(template, data).trim(), '<h2> You are can view and edit user </h2>')
@@ -61,10 +59,8 @@ test.group('View Can Tag', function (group) {
     `
 
     const data = {
-      auth: {
-        user: {
-          can: () => false
-        }
+      acl: {
+        permissions: ['delete_user']
       }
     }
     assert.equal(edge.renderString(template, data).trim(), '<h2> You are not can view and edit user </h2>')
@@ -94,10 +90,8 @@ test.group('View Is Tag', function (group) {
     `
 
     const data = {
-      auth: {
-        user: {
-          is: () => true
-        }
+      acl: {
+        roles: ['administrator']
       }
     }
     assert.equal(edge.renderString(template, data).trim(), '<h2> You are can view, edit && delete blog post </h2>')
@@ -115,10 +109,8 @@ test.group('View Is Tag', function (group) {
     `
 
     const data = {
-      auth: {
-        user: {
-          is: () => false
-        }
+      acl: {
+        roles: ['customer']
       }
     }
     assert.equal(edge.renderString(template, data).trim(), '<h2> You are not can view, edit && delete blog post </h2>')
@@ -148,10 +140,8 @@ test.group('View Scope Tag', function (group) {
     `
 
     const data = {
-      auth: {
-        user: {
-          scope: () => true
-        }
+      acl: {
+        permissions: ['user.view', 'user.edit']
       }
     }
     assert.equal(edge.renderString(template, data).trim(), '<h2> You are can view and edit user </h2>')
@@ -169,10 +159,8 @@ test.group('View Scope Tag', function (group) {
     `
 
     const data = {
-      auth: {
-        user: {
-          scope: () => false
-        }
+      acl: {
+        permissions: ['user.delete']
       }
     }
     assert.equal(edge.renderString(template, data).trim(), '<h2> You are can not view and edit user </h2>')

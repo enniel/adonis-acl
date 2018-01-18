@@ -73,6 +73,16 @@ const namedMiddleware = {
 }
 ```
 
+For using in views
+
+```js
+const globalMiddleware = [
+  ...
+  'Adonis/Acl/Init'
+  ...
+]
+```
+
 6. Publish the package migrations to your application and run these with `./ace migrations:run`.
 
 ```bash
@@ -327,6 +337,41 @@ Route
 Route
   .get('/posts')
   .middleware(['auth:jwt', 'can:read_posts'])
+
+// scopes (using permissions table for scopes)
+Route
+  .get('/posts')
+  .middleware(['auth:jwt', 'scope:posts.*'])
+```
+
+## Using in Views
+
+```
+@loggedIn
+  @is('administrator')
+    <h2>Protected partial</h2>
+  @endis
+@endloggedIn
+```
+
+or
+
+```
+@loggedIn
+  @can('create_posts && delete_posts')
+    <h2>Protected partial</h2>
+  @endcan
+@endloggedIn
+```
+
+or
+
+```
+@loggedIn
+  @scope('posts.create', 'posts.delete')
+    <h2>Protected partial</h2>
+  @endscope
+@endloggedIn
 ```
 
 ## Credits

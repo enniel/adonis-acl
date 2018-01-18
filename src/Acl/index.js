@@ -6,6 +6,7 @@
  * MIT Licensed
  */
 
+const _ = require('lodash')
 const InvalidExpression = require('../Exceptions/InvalidExpression')
 
 const Acl = exports = module.exports = {}
@@ -13,24 +14,24 @@ const Acl = exports = module.exports = {}
 const operators = {
   or: {
     precedence: 1,
-    func: async (a, b, toBool) => {
-      a = await toBool(a)
-      b = await toBool(b)
+    func: (a, b, toBool) => {
+      a = toBool(a)
+      b = toBool(b)
       return a || b
     }
   },
   and: {
     precedence: 2,
-    func: async (a, b, toBool) => {
-      a = await toBool(a)
-      b = await toBool(b)
+    func: (a, b, toBool) => {
+      a = toBool(a)
+      b = toBool(b)
       return a && b
     }
   },
   not: {
     precedence: 3,
-    func: async (b, toBool) => {
-      b = await toBool(b)
+    func: (b, toBool) => {
+      b = toBool(b)
       return !b
     },
     n: 1
@@ -96,7 +97,7 @@ const convertToRPN = (exp) => {
   return rpn.concat(stack.reverse())
 }
 
-const calculateRPN = async (rpn, toBool) => {
+const calculateRPN = (rpn, toBool) => {
   const stack = []
   for (let token of rpn) {
     const operator = operators[token]
@@ -107,10 +108,10 @@ const calculateRPN = async (rpn, toBool) => {
         args.push(stack.pop())
       }
       args = args.reverse().concat(toBool)
-      const result = await operator.func(...args)
+      const result = operator.func(...args)
       stack.push(result)
     } else {
-      const result = await toBool(token)
+      const result = toBool(token)
       stack.push(result)
     }
   }
@@ -131,5 +132,18 @@ Acl.check = (expression, toBool) => {
       return operand
     }
     return toBool(operand)
+  })
+}
+
+Acl.validateScope = (required, provided) => {
+  return _.every(required, (scope) => {
+    return _.some(provided, (permission) => {
+      // user.* -> user.create, user.view.self
+      const regExp = new RegExp('^' + scope.replace('*', '.*') + '$')
+      if (regExp.exec(permission)) {
+        return true
+      }
+      return false
+    })
   })
 }

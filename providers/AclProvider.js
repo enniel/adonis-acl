@@ -28,6 +28,10 @@ class AclProvider extends ServiceProvider {
       const HasPermission = require('../src/Traits/HasPermission')
       return new HasPermission()
     })
+    this.app.bind('Adonis/Acl/Init', () => {
+      const Init = require('../src/Middlewares/Init')
+      return new Init()
+    })
     this.app.bind('Adonis/Acl/Is', () => {
       const Is = require('../src/Middlewares/Is')
       return new Is()

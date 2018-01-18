@@ -6,6 +6,8 @@
  * MIT Licensed
  */
 
+const Acl = require('../Acl')
+
 module.exports = function (BaseTag) {
   return class ScopeTag extends BaseTag {
     /**
@@ -56,8 +58,7 @@ module.exports = function (BaseTag) {
       /**
        * Open tag
        */
-      buffer.writeLine(`var user = this.context.accessChild(this.context.resolve('auth'), ['user'])`)
-      buffer.writeLine(`if (user && user.scope(${args})) {`)
+      buffer.writeLine(`if (this.context.scope(${args})) {`)
       buffer.indent()
 
       /**
@@ -77,6 +78,11 @@ module.exports = function (BaseTag) {
      *
      * @method run
      */
-    run () {}
+    run (Context) {
+      Context.macro('scope', function (required) {
+        const provided = this.accessChild(this.resolve('acl'), ['permissions'])
+        return Acl.validateScope(required, provided)
+      })
+    }
   }
 }
