@@ -78,8 +78,5 @@ module.exports = {
   },
   down: function (knex) {
     return this.dropTables(knex)
-  },
-  createDatabaseDir: () => {
-    return fs.ensureDir(path.join(__dirname, './database'))
   }
 }
