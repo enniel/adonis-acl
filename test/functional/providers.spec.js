@@ -8,23 +8,9 @@
 
 const path = require('path')
 const { ioc, registrar } = require('@adonisjs/fold')
-const { Config } = require('@adonisjs/sink')
 const test = require('japa')
-const Model = require('@adonisjs/lucid/src/Lucid/Model')
-const DatabaseManager = require('@adonisjs/lucid/src/Database/Manager')
 
 test.group('Providers', (group) => {
-  group.before(() => {
-    ioc.singleton('Adonis/Src/Database', function () {
-      const config = new Config()
-      config.set('database', require('../config'))
-      return new DatabaseManager(config)
-    })
-    ioc.alias('Adonis/Src/Database', 'Database')
-    ioc.bind('Adonis/Src/Model', () => Model)
-    ioc.alias('Adonis/Src/Model', 'Model')
-  })
-
   test('AclProvider', async (assert) => {
     await registrar
       .providers([path.join(__dirname, '../../providers/AclProvider')])

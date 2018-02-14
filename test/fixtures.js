@@ -7,8 +7,6 @@
  */
 
 const bluebird = require('bluebird')
-const fs = require('fs-extra')
-const path = require('path')
 
 module.exports = {
   setupTables: function (knex) {
@@ -73,7 +71,6 @@ module.exports = {
     return knex.table(table).truncate()
   },
   up: async function (knex) {
-    await fs.ensureDir(path.join(__dirname, './tmp'))
     await this.setupTables(knex)
   },
   down: function (knex) {

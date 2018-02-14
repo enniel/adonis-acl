@@ -8,24 +8,20 @@
 
 const test = require('japa')
 const ace = require('@adonisjs/ace')
+const fs = require('fs-extra')
 const path = require('path')
 const walkSync = require('walk-sync')
 const { ioc, registrar } = require('@adonisjs/fold')
 const { Config, setupResolver, Helpers } = require('@adonisjs/sink')
-const DatabaseManager = require('@adonisjs/lucid/src/Database/Manager')
-const Model = require('@adonisjs/lucid/src/Lucid/Model')
 const fixtures = require('../fixtures')
 
 test.group('Commands', (group) => {
   group.before(async () => {
-    ioc.singleton('Adonis/Src/Database', function () {
+    ioc.bind('Adonis/Src/Config', () => {
       const config = new Config()
       config.set('database', require('../config'))
-      return new DatabaseManager(config)
+      return config
     })
-    ioc.alias('Adonis/Src/Database', 'Database')
-    ioc.bind('Adonis/Src/Model', () => Model)
-    ioc.alias('Adonis/Src/Model', 'Model')
     ioc.bind('Adonis/Src/Helpers', () => {
       return new Helpers(path.join(__dirname, '..'))
     })
@@ -33,9 +29,11 @@ test.group('Commands', (group) => {
 
     await registrar
       .providers([
+        '@adonisjs/lucid/providers/LucidProvider',
         path.join(__dirname, '../../providers/AclProvider'),
         path.join(__dirname, '../../providers/CommandsProvider')
       ]).registerAndBoot()
+    await fs.ensureDir(path.join(__dirname, '../tmp'))
     const Database = use('Database')
     await fixtures.up(Database)
     setupResolver()
@@ -49,7 +47,15 @@ test.group('Commands', (group) => {
     const Database = use('Database')
     await fixtures.down(Database)
     Database.close()
-  })
+
+    try {
+      await fs.remove(path.join(__dirname, '../tmp'))
+    } catch (error) {
+      if (process.platform !== 'win32' || error.code !== 'EBUSY') {
+        throw error
+      }
+    }
+  }).timeout(0)
 
   group.afterEach(async () => {
     const Database = use('Database')

@@ -8,6 +8,8 @@
 
 require('@adonisjs/lucid/lib/iocResolver').setFold(require('@adonisjs/fold'))
 const test = require('japa')
+const fs = require('fs-extra')
+const path = require('path')
 const Model = require('@adonisjs/lucid/src/Lucid/Model')
 const DatabaseManager = require('@adonisjs/lucid/src/Database/Manager')
 const BelongsToMany = require('@adonisjs/lucid/src/Lucid/Relations/BelongsToMany')
@@ -39,6 +41,7 @@ test.group('Traits', function (group) {
     ioc.bind('Adonis/Acl/HasPermission', function () {
       return new HasPermission()
     })
+    await fs.ensureDir(path.join(__dirname, '../tmp'))
     const Database = use('Database')
     await fixtures.up(Database)
     setupResolver()
@@ -52,7 +55,15 @@ test.group('Traits', function (group) {
     const Database = use('Database')
     await fixtures.down(Database)
     Database.close()
-  })
+
+    try {
+      await fs.remove(path.join(__dirname, '../tmp'))
+    } catch (error) {
+      if (process.platform !== 'win32' || error.code !== 'EBUSY') {
+        throw error
+      }
+    }
+  }).timeout(0)
 
   group.afterEach(async function () {
     const Database = use('Database')
