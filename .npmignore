@@ -14,3 +14,4 @@ coverage
 .coveralls.yml
 .travis.yml
 .nyc_output
+appveyor.yml
