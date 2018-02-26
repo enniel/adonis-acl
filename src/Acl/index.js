@@ -40,7 +40,7 @@ const operators = {
 
 // synonyms
 operators['&&'] = operators.and
-operators['||'] = operators.or
+operators['OR'] = operators.or
 operators['!'] = operators.not
 
 // add whitespace to '(', ')', and '!' operators so that
