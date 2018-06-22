@@ -72,6 +72,6 @@ package-lock.json
 # tmp dirs
 test/tmp
 test/database
-
+.idea
 
 # End of https://www.gitignore.io/api/node

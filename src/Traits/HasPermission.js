@@ -16,6 +16,7 @@ module.exports = class HasPermission {
     }
 
     Model.prototype.getPermissions = async function () {
+      this.reload()
       let permissions = await this.permissions().fetch()
       permissions = permissions.rows.map(({ slug }) => slug)
       if (typeof this.roles === 'function') {
