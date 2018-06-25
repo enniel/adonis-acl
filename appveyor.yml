@@ -1,3 +1,5 @@
+image: ubuntu
+
 environment:
   matrix:
   - nodejs_version: 'Stable'
