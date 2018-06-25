@@ -16,6 +16,7 @@ module.exports = class HasRole {
     }
 
     Model.prototype.getRoles = async function () {
+      this.reload()
       const roles = await this.roles().fetch()
       return roles.rows.map(({ slug }) => slug)
     }

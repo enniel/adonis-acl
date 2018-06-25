@@ -1,3 +1,5 @@
+image: ubuntu
+
 environment:
   matrix:
   - nodejs_version: 'Stable'
@@ -13,7 +15,7 @@ install:
 test_script:
   - node --version
   - npm --version
-  - npm run test:win
+  - npm run test
 
 build: off
 clone_depth: 1
