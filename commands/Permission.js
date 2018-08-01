@@ -51,7 +51,7 @@ class PermissionCommand extends Command {
     name = name || slug
     let permission = await Permission.findBy('slug', slug)
     if (permission) {
-      permission.fill({
+      permission.merge({
         name, description
       })
       await permission.save()

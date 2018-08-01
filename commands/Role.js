@@ -53,7 +53,7 @@ class RoleCommand extends Command {
     name = name || slug
     let role = await Role.findBy('slug', slug)
     if (role) {
-      role.fill({
+      role.merge({
         name, description
       })
       await role.save()
