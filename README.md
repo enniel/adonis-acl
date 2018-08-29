@@ -321,17 +321,17 @@ await user.permissions().fetch()
 
 Syntax:
 
-`and (&&)` - administrator && moderator
+`and` - administrator,and,moderator
 
-`or (||)` - administrator || moderator
+`or` - administrator,or,moderator
 
-`not (!)` - administrator && !moderator
+`not` - administrator,and,not,moderator
 
 ```js
 // check roles
 Route
   .get('/users')
-  .middleware(['auth:jwt', 'is:(administrator || moderator) && !customer'])
+  .middleware(['auth:jwt', 'is:(administrator,or,moderator),and,not,customer'])
 
 // check permissions
 Route
