@@ -14,6 +14,7 @@ Adonis ACL adds role based permissions to built in [Auth System](https://github.
 ```bash
 $ npm i adonis-acl --save
 ```
+
 or
 
 ```bash
@@ -124,6 +125,7 @@ class User extends Model {
 ```
 
 ### Attach Role(s) To User
+
 ```js
 const user = await User.find(1)
 await user.roles().attach([roleAdmin.id, roleModerator.id])
@@ -193,24 +195,28 @@ class User extends Model {
 
 ```js
 const roleAdmin = await Role.find(1)
-await roleAdmin.permissions().attach([
-  createUsersPermission.id,
-  updateUsersPermission.id,
-  deleteUsersPermission.is,
-  readUsersPermission.id
-])
+await roleAdmin
+  .permissions()
+  .attach([
+    createUsersPermission.id,
+    updateUsersPermission.id,
+    deleteUsersPermission.is,
+    readUsersPermission.id
+  ])
 ```
 
 ### Detach Permissions from Role
 
 ```js
 const roleAdmin = await Role.find(1)
-await roleAdmin.permissions().detach([
-  createUsersPermission.id,
-  updateUsersPermission.id,
-  deleteUsersPermission.is,
-  readUsersPermission.id
-])
+await roleAdmin
+  .permissions()
+  .detach([
+    createUsersPermission.id,
+    updateUsersPermission.id,
+    deleteUsersPermission.is,
+    readUsersPermission.id
+  ])
 ```
 
 ### Get User Permissions
@@ -279,24 +285,28 @@ class User extends Model {
 
 ```js
 const user = await User.find(1)
-await user.permissions().attach([
-  createUsersPermission.id,
-  updateUsersPermission.id,
-  deleteUsersPermission.is,
-  readUsersPermission.id
-])
+await user
+  .permissions()
+  .attach([
+    createUsersPermission.id,
+    updateUsersPermission.id,
+    deleteUsersPermission.is,
+    readUsersPermission.id
+  ])
 ```
 
 ### Detach Permissions from User
 
 ```js
 const user = await User.find(1)
-await user.permissions().detach([
-  createUsersPermission.id,
-  updateUsersPermission.id,
-  deleteUsersPermission.is,
-  readUsersPermission.id
-])
+await user
+  .permissions()
+  .detach([
+    createUsersPermission.id,
+    updateUsersPermission.id,
+    deleteUsersPermission.is,
+    readUsersPermission.id
+  ])
 ```
 
 ### Get User Permissions
@@ -321,27 +331,24 @@ await user.permissions().fetch()
 
 Syntax:
 
-`and (&&)` - administrator && moderator
+`and` - administrator and moderator
 
-`or (||)` - administrator || moderator
+`or` - administrator or moderator
 
-`not (!)` - administrator && !moderator
+`not (!)` - administrator and !moderator
 
 ```js
 // check roles
-Route
-  .get('/users')
-  .middleware(['auth:jwt', 'is:(administrator || moderator) && !customer'])
+Route.get('/users').middleware([
+  'auth:jwt',
+  'is:(administrator and moderator) or !customer'
+])
 
 // check permissions
-Route
-  .get('/posts')
-  .middleware(['auth:jwt', 'can:read_posts'])
+Route.get('/posts').middleware(['auth:jwt', 'can:read_posts'])
 
 // scopes (using permissions table for scopes)
-Route
-  .get('/posts')
-  .middleware(['auth:jwt', 'scope:posts.*'])
+Route.get('/posts').middleware(['auth:jwt', 'scope:posts.*'])
 ```
 
 ## Using in Views
@@ -358,7 +365,7 @@ or
 
 ```
 @loggedIn
-  @can('create_posts && delete_posts')
+  @can('create_posts or delete_posts')
     <h2>Protected partial</h2>
   @endcan
 @endloggedIn
