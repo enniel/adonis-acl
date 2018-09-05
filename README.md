@@ -331,7 +331,7 @@ Syntax:
 // check roles
 Route
   .get('/users')
-  .middleware(['auth:jwt', 'is:(administrator,or,moderator),and,not,customer'])
+  .middleware(['auth:jwt', 'is:(administrator or moderator) and not customer'])
 
 // check permissions
 Route
