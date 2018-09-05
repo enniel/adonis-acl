@@ -12,8 +12,11 @@ class Is {
   async handle ({ auth }, next, ...args) {
     let expression = args[0]
     if (Array.isArray(expression)) {
-      expression = expression[0]
+      expression = expression.join(' ')
     }
+    expression = expression.replace(' or ', ' || ')
+    expression = expression.replace(' and ', ' && ')
+    expression = expression.replace(' not ', ' !')
     const is = await auth.user.is(expression)
     if (!is) {
       throw new ForbiddenException()
