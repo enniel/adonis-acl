@@ -29,6 +29,10 @@ class Init {
       if (typeof user.getPermissions === 'function') {
         permissions = await user.getPermissions()
       }
+      
+      auth.user.preFetchedPermissions = permissions
+      auth.user.preFetchedRoles = roles
+      
       view.share({
         acl: {
           roles, permissions
