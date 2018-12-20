@@ -14,7 +14,9 @@ class Is {
     if (Array.isArray(expression)) {
       expression = expression[0]
     }
-    const is = await auth.user.is(expression)
+    
+    const is = Acl.check(expression, operand => _.includes(auth.user.preFetchedRoles, operand))
+    
     if (!is) {
       throw new ForbiddenException()
     }
