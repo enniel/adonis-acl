@@ -10,6 +10,11 @@ const { ServiceProvider } = require('@adonisjs/fold')
 
 class AclProvider extends ServiceProvider {
   register () {
+    this.app.bind('Adonis/Acl/Context', () => {
+      const Context = require('../src/Models/Context')
+      Context._bootIfNotBooted();
+      return Context
+    })
     this.app.bind('Adonis/Acl/Role', () => {
       const Role = require('../src/Models/Role')
       Role._bootIfNotBooted()
