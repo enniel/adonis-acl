@@ -25,6 +25,10 @@ class Role extends Model {
     const permissions = await this.permissions().fetch()
     return permissions.rows.map(({ slug }) => slug)
   }
+  
+  users () {
+    return this.belongsToMany('App/Models/User')
+  }
 }
 
 module.exports = Role
