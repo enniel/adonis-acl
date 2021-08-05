@@ -1,3 +1,9 @@
+## !!! Maintainer Needed !!!
+
+I currently don't have the resources to maintain this project. If someone is willing to put in the time to do it, I'm willing to assign the necessary privileges to that person. If you're willing to do this, reply on [issue](https://github.com/enniel/adonis-acl/issues/49) or send me [email](mailto:razumov.evgeni@gmail.com).
+
+
+
 # Adonis ACL
 
 Adonis ACL adds role based permissions to built in [Auth System](https://github.com/adonisjs/adonis-auth) of [Adonis Framework](https://github.com/adonisjs/adonis-framework).
