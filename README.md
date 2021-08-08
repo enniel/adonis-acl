@@ -202,7 +202,7 @@ const roleAdmin = await Role.find(1)
 await roleAdmin.permissions().attach([
   createUsersPermission.id,
   updateUsersPermission.id,
-  deleteUsersPermission.is,
+  deleteUsersPermission.id,
   readUsersPermission.id
 ])
 ```
@@ -214,7 +214,7 @@ const roleAdmin = await Role.find(1)
 await roleAdmin.permissions().detach([
   createUsersPermission.id,
   updateUsersPermission.id,
-  deleteUsersPermission.is,
+  deleteUsersPermission.id,
   readUsersPermission.id
 ])
 ```
@@ -288,7 +288,7 @@ const user = await User.find(1)
 await user.permissions().attach([
   createUsersPermission.id,
   updateUsersPermission.id,
-  deleteUsersPermission.is,
+  deleteUsersPermission.id,
   readUsersPermission.id
 ])
 ```
@@ -300,7 +300,7 @@ const user = await User.find(1)
 await user.permissions().detach([
   createUsersPermission.id,
   updateUsersPermission.id,
-  deleteUsersPermission.is,
+  deleteUsersPermission.id,
   readUsersPermission.id
 ])
 ```
